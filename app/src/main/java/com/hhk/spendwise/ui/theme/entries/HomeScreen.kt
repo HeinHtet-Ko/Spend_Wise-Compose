@@ -63,7 +63,7 @@ fun HomeScreen() {
     }
 
     val balance: String by remember {
-        mutableStateOf("150000Ks")
+        mutableStateOf("1000000Ks")
     }
 
     val onNextMonth: () -> (String) = remember {
