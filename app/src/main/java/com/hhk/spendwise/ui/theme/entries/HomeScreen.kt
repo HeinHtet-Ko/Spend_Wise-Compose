@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -35,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -91,9 +95,9 @@ fun HomeScreen() {
             ) {
                 Spacer(modifier = Modifier.height(60.dp))
                 Text(
-                    text = "Over  view",
+                    text = "Overview",
                     color = Color.White,
-                    fontSize = 95.sp,
+                    fontSize = 25.sp,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Bold
                 )
@@ -162,7 +166,7 @@ fun UpperCard(
             .fillMaxWidth()
             .fillMaxHeight(0.5f)
             .padding(5.dp, 20.dp),
-        horizontalArrangement = Arrangement.SpaceAround
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         var date by remember { mutableStateOf("January 2020") }
         var isIncrease by remember {
@@ -173,16 +177,17 @@ fun UpperCard(
             mutableStateOf(0)
         }
 
-        Icon(modifier = Modifier
+        Image(modifier = Modifier
             .clip(CircleShape)
+            .background(Color.Red)
             .clickable {
                 onPrev.invoke()
                 isIncrease = false
                 date = "decrease ${--data}"
-            }
-            .padding(5.dp),
+            }.padding(7.dp) ,
             painter = painterResource(id = R.drawable.ic_arrow_back),
-            contentDescription = null)
+            contentDescription = null,
+        contentScale = ContentScale.Crop)
 
         AnimatedContent(targetState = date, transitionSpec = {
             if (isIncrease)
@@ -203,16 +208,17 @@ fun UpperCard(
         }
 
 
-        Icon(modifier = Modifier
+        Image(modifier = Modifier
             .clip(CircleShape)
+            .background(Color.Red)
             .clickable {
                 onNext.invoke()
                 isIncrease = true
                 date = "increase ${++data}"
-            }
-            .padding(5.dp),
+            }.padding(7.dp),
             painter = painterResource(id = R.drawable.ic_arrow_forward),
-            contentDescription = null)
+            contentDescription = null,
+        contentScale = ContentScale.Crop)
     }
 
 }
