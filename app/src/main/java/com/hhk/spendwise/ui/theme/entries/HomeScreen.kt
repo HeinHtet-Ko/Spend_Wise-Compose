@@ -7,8 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +18,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -38,7 +37,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.hhk.spendwise.R
+import com.hhk.spendwise.models.BudgetItem
+import com.hhk.spendwise.models.FinanceType
 import com.hhk.spendwise.ui.theme.LightBlue
 import com.hhk.spendwise.ui.theme.Purple200
 import com.hhk.spendwise.ui.theme.WhiteBlue
@@ -54,35 +54,33 @@ import com.hhk.spendwise.ui.theme.WhiteBlue
 @Composable
 fun HomeScreen() {
 
-    var income: String by remember {
-        mutableStateOf("2000Ks")
+    var income: Double by remember {
+        mutableStateOf(800000.00)
     }
 
     var isIncrease by remember {
         mutableStateOf(false)
     }
 
-    val expense: String by remember {
-        mutableStateOf("50000Ks")
+    val expense: Double by remember {
+        mutableStateOf(300000.00)
     }
 
-    val balance: String by remember {
-        mutableStateOf("1000000Ks")
+    val balance: Double by remember {
+        mutableStateOf(200000.00)
     }
 
-    val onNextMonth: () -> (String) = remember {
+    val onNextMonth: () -> (Unit) = remember {
         {
             isIncrease = true
-            income += "8yt90"
-            income
+            income += 10000
         }
     }
 
-    val onPrevious: () -> (String) = remember {
+    val onPrevious: () -> (Unit) = remember {
         {
-            isIncrease = true
-            income = income.toCharArray().toMutableList().removeLast().toString()
-            income
+            isIncrease = false
+            income -= 10000
         }
     }
     BackgroundCurve(0.33f, LightBlue) {
@@ -114,7 +112,8 @@ fun HomeScreen() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Card(
-                        backgroundColor = Purple200, modifier = Modifier
+                        backgroundColor = Purple200,
+                        modifier = Modifier
                             .fillMaxWidth(0.85f)
                             .height(150.dp),
                         shape = RoundedCornerShape(7.dp),
@@ -123,7 +122,8 @@ fun HomeScreen() {
                         Column {
                             UpperCard(
                                 onNextMonth,
-                                onPrevious
+                                onPrevious,
+                                isIncrease
                             )
                             AnimatedContent(targetState = income, transitionSpec = {
                                 if (isIncrease)
@@ -142,24 +142,22 @@ fun HomeScreen() {
                                     expense
                                 )
                             }
-
                         }
-
                     }
                 }
             }
 
+            BudgetList()
         }
-
     }
-
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun UpperCard(
-    onNext: () -> String,
-    onPrev: () -> String
+    onNext: () -> Unit,
+    onPrev: () -> Unit,
+    isIncrease: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -169,25 +167,22 @@ fun UpperCard(
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         var date by remember { mutableStateOf("January 2020") }
-        var isIncrease by remember {
-            mutableStateOf(false)
-        }
 
         var data by remember {
             mutableStateOf(0)
         }
 
-        Image(modifier = Modifier
-            .clip(CircleShape)
-            .background(Color.Red)
-            .clickable {
-                onPrev.invoke()
-                isIncrease = false
-                date = "decrease ${--data}"
-            }.padding(7.dp) ,
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable {
+                    onPrev.invoke()
+                    date = "decrease ${--data}"
+                }
+                .padding(5.dp),
             painter = painterResource(id = R.drawable.ic_arrow_back),
             contentDescription = null,
-        contentScale = ContentScale.Crop)
+        )
 
         AnimatedContent(targetState = date, transitionSpec = {
             if (isIncrease)
@@ -202,66 +197,50 @@ fun UpperCard(
                 ) with fadeOut(animationSpec = tween(0))
         }) {
             Text(
-                text = date, modifier = Modifier.padding(horizontal = 75.dp, 0.dp),
+                text = date, modifier = Modifier.padding(horizontal = 50.dp, 0.dp),
                 style = MaterialTheme.typography.caption
             )
         }
 
-
-        Image(modifier = Modifier
-            .clip(CircleShape)
-            .background(Color.Red)
-            .clickable {
-                onNext.invoke()
-                isIncrease = true
-                date = "increase ${++data}"
-            }.padding(7.dp),
+        Icon(
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable {
+                    onNext.invoke()
+                    date = "increase ${++data}"
+                }
+                .padding(5.dp),
             painter = painterResource(id = R.drawable.ic_arrow_forward),
             contentDescription = null,
-        contentScale = ContentScale.Crop)
+        )
     }
-
 }
 
 @Composable
-fun LowerCard(income: String, expense: String) {
+fun LowerCard(income: Double, expense: Double) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Column(
-            modifier = Modifier
-                .padding(7.dp, 3.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Income", style = MaterialTheme.typography.body1)
-            Spacer(modifier = Modifier.height(7.dp))
-            Text(text = income, style = MaterialTheme.typography.subtitle1)
-        }
-        Column(
-            modifier = Modifier
-                .padding(7.dp, 3.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Expense", style = MaterialTheme.typography.body1)
-            Spacer(modifier = Modifier.height(7.dp))
-            Text(text = expense, style = MaterialTheme.typography.subtitle1)
-        }
-
+        HomeCardText(key = FinanceType.Expense.CLOTH(), value = expense)
+        HomeCardText(key = FinanceType.Income.SALARY(), value = income)
     }
 }
 
 @Composable
-fun HomeCardText(key: FinanceType, value: String) {
+fun HomeCardText(key: FinanceType, value: Double) {
     Column(
         modifier = Modifier
             .padding(7.dp, 3.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = key.name, style = MaterialTheme.typography.body1)
+        Text(
+            text = if (key is FinanceType.Expense) "Expense" else "Income",
+            style = MaterialTheme.typography.body1
+        )
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = value, style = MaterialTheme.typography.subtitle1)
+        Text(text = "$value Ks", style = MaterialTheme.typography.subtitle1)
     }
 }
 
@@ -273,14 +252,13 @@ fun BackgroundCurve(curveHeight: Float, curveBackground: Color, content: @Compos
                 .fillMaxWidth()
                 .fillMaxHeight(curveHeight),
             onDraw = {
-
                 drawCircle(
                     brush = Brush.horizontalGradient(listOf(curveBackground, WhiteBlue)),
                     radius = size.height + 260,
-                    center = Offset(x = size.width / 2f, -250f),
-
-                    )
-            })
+                    center = Offset(x = size.width / 2f, -250f)
+                )
+            }
+        )
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopCenter
@@ -288,7 +266,20 @@ fun BackgroundCurve(curveHeight: Float, curveBackground: Color, content: @Compos
             content.invoke()
         }
     }
-
 }
 
-enum class FinanceType { Income, Expense, Balance }
+@Composable
+fun BudgetList(
+    budgetList: List<BudgetItem> = listOf(
+        BudgetItem(FinanceType.Expense.CLOTH(), "Clothes", 50000.00),
+        BudgetItem(FinanceType.Income.SALARY(), "Salary", 50000.00)
+    )
+) {
+    LazyColumn {
+        items(budgetList, key = { it.name }) {
+            Row(modifier = Modifier.fillMaxWidth(0.8f)) {
+                Text(text = "${it.name} and ${it.amount} and ${if (it.category is FinanceType.Expense) "--" else "++"}")
+            }
+        }
+    }
+}

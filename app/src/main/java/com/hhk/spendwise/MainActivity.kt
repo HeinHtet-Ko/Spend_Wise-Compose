@@ -18,10 +18,7 @@ import com.hhk.spendwise.ui.theme.entries.HomeScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Hides the ugly action bar at the top
         actionBar?.hide()
-
-        //Hide the status bars
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -35,8 +32,6 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             SpendWiseTheme {
-                // A surface container using the 'background' color from the them
-
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
