@@ -12,8 +12,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
+import com.hhk.spendwise.ui.entries.HomeScreen
 import com.hhk.spendwise.ui.theme.SpendWiseTheme
-import com.hhk.spendwise.ui.theme.entries.HomeScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
